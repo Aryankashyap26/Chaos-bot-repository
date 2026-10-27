@@ -1,6 +1,10 @@
 import ollama
 
-EXIT_COMMANDS = {"exit", "/exit", "quit", "/quit", "bye", "/bye", "q"}
+EXIT_COMMANDS = {
+    "exit", "/exit", ".exit", "exit()",
+    "quit", "/quit", ".quit", "quit()",
+    "bye", "/bye", "q", ":q"
+}
 
 def chatbot():
     print("\n🤖 Gemma Assistant initialized! Type 'exit' or '/exit' to quit.\n")
@@ -16,7 +20,9 @@ def chatbot():
         if not user_input:
             continue
 
-        if user_input.lower() in EXIT_COMMANDS:
+        # Flexible exit check (e.g. /exit, exit, quit, :q, etc.)
+        clean_input = user_input.lower().rstrip("()").lstrip("/.")
+        if clean_input in {"exit", "quit", "bye", "q"} or user_input.lower() in EXIT_COMMANDS:
             print("Goodbye!")
             break
 
