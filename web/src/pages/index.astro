@@ -1,0 +1,661 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Chaos Bot — High-Impact AI Intelligence" description="Cal.com-inspired AI interface bridging raw creative chaos with razor-sharp reasoning. Runs online and offline.">
+  <div class="flex h-screen w-full bg-[#09090b] text-[#f4f4f5] overflow-hidden select-none">
+    
+    <!-- LEFT SIDEBAR: Cal.com minimal sidebar -->
+    <aside id="sidebar" class="w-72 flex-shrink-0 border-r border-[#27272a] bg-[#0c0c0e] flex flex-col justify-between transition-all duration-200 hidden md:flex">
+      <!-- Top Brand -->
+      <div class="p-4 border-b border-[#27272a]">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-white text-black font-bold flex items-center justify-center text-sm tracking-tight shadow-sm">
+              ⚡
+            </div>
+            <div>
+              <div class="font-semibold text-sm tracking-tight flex items-center gap-1.5">
+                Chaos Bot
+                <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-[#27272a] text-[#a1a1aa] border border-[#3f3f46]">v2.4</span>
+              </div>
+              <p class="text-[11px] text-[#71717a] font-mono">chaosbot.com</p>
+            </div>
+          </div>
+          <button id="new-chat-btn" title="New Session" class="w-8 h-8 rounded-lg border border-[#27272a] hover:bg-[#18181b] hover:border-[#3f3f46] text-[#a1a1aa] hover:text-white flex items-center justify-center transition-colors text-sm">
+            +
+          </button>
+        </div>
+
+        <!-- Mode status banner -->
+        <div class="mt-4 p-2.5 rounded-lg border border-[#27272a] bg-[#141417]">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="text-[#71717a] font-medium">Engine Mode</span>
+            <span id="engine-status-badge" class="flex items-center gap-1.5 text-[11px] text-emerald-400 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Local (Offline)
+            </span>
+          </div>
+          <p class="text-[11px] text-[#a1a1aa] leading-tight">
+            Powered by on-device Gemma 2 (2B) weights. 100% private.
+          </p>
+        </div>
+      </div>
+
+      <!-- Recent Conversations -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-1">
+        <div class="px-2 py-1 text-[11px] font-medium text-[#71717a] uppercase tracking-wider">
+          Sessions
+        </div>
+        <button class="w-full text-left px-2.5 py-2 rounded-lg bg-[#18181b] text-white text-xs font-medium border border-[#27272a] flex items-center justify-between group">
+          <span class="truncate">⚡ Architecture Teardown</span>
+          <span class="text-[10px] text-[#71717a] font-mono">Now</span>
+        </button>
+        <button class="w-full text-left px-2.5 py-2 rounded-lg hover:bg-[#141417] text-[#a1a1aa] hover:text-white text-xs font-medium transition-colors flex items-center justify-between group">
+          <span class="truncate">🛡️ Q3 Financial Summary</span>
+          <span class="text-[10px] text-[#71717a] font-mono">2h ago</span>
+        </button>
+        <button class="w-full text-left px-2.5 py-2 rounded-lg hover:bg-[#141417] text-[#a1a1aa] hover:text-white text-xs font-medium transition-colors flex items-center justify-between group">
+          <span class="truncate">🧠 Gemma 2 Benchmarking</span>
+          <span class="text-[10px] text-[#71717a] font-mono">Yesterday</span>
+        </button>
+      </div>
+
+      <!-- Bottom System Pill -->
+      <div class="p-3 border-t border-[#27272a] space-y-2">
+        <button id="toggle-terminal-view" class="w-full py-2 px-2.5 rounded-lg border border-[#27272a] hover:bg-[#18181b] hover:border-[#3f3f46] text-xs font-mono text-[#a1a1aa] hover:text-white flex items-center justify-between transition-colors">
+          <span class="flex items-center gap-2">
+            <span class="text-xs">💻</span> Antigravity CLI
+          </span>
+          <span class="text-[10px] bg-[#27272a] px-1.5 py-0.5 rounded text-[#d4d4d8]">app.py</span>
+        </button>
+
+        <div class="flex items-center justify-between text-[11px] text-[#71717a] px-1 font-mono">
+          <span>Latency: ~14ms</span>
+          <a href="https://github.com/Aryankashyap26/gemma-bot-repository" target="_blank" class="hover:text-white transition-colors">GitHub ↗</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT CANVAS -->
+    <main class="flex-1 flex flex-col h-full bg-[#09090b] relative overflow-hidden">
+      
+      <!-- TOP NAVIGATION BAR -->
+      <header class="h-14 border-b border-[#27272a] px-4 flex items-center justify-between flex-shrink-0 bg-[#09090b]/80 backdrop-blur-md z-10">
+        <div class="flex items-center gap-3">
+          <!-- Mobile Sidebar Toggle -->
+          <button id="mobile-sidebar-toggle" class="md:hidden p-1.5 rounded-md border border-[#27272a] text-[#a1a1aa]">
+            ☰
+          </button>
+
+          <!-- Personality Switcher (Cal.com segmented pill) -->
+          <div class="bg-[#141417] p-1 rounded-lg border border-[#27272a] flex items-center gap-1 text-xs font-medium">
+            <button id="mode-chaos-btn" class="px-2.5 py-1 rounded-md bg-white text-black font-semibold transition-all shadow-sm flex items-center gap-1.5">
+              <span>⚡</span> Chaos
+            </button>
+            <button id="mode-order-btn" class="px-2.5 py-1 rounded-md text-[#a1a1aa] hover:text-white transition-all flex items-center gap-1.5">
+              <span>🛡️</span> Order
+            </button>
+          </div>
+
+          <!-- Think Toggle -->
+          <button id="toggle-think-btn" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#27272a] text-xs font-medium text-[#a1a1aa] hover:text-white hover:border-[#3f3f46] transition-colors">
+            <span class="w-2 h-2 rounded-full bg-violet-400"></span>
+            <span>Reasoning (Think)</span>
+            <span class="text-[10px] font-mono px-1 rounded bg-[#27272a] text-[#a1a1aa]">ON</span>
+          </button>
+        </div>
+
+        <!-- Right action icons -->
+        <div class="flex items-center gap-2">
+          <!-- Engine Switcher Dropdown/Button -->
+          <button id="engine-toggle-btn" class="px-2.5 py-1.5 rounded-lg border border-[#27272a] hover:bg-[#141417] text-xs font-mono text-[#a1a1aa] hover:text-white flex items-center gap-1.5 transition-colors">
+            <span id="engine-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="engine-label">Local Ollama</span>
+          </button>
+
+          <!-- Command Palette Trigger -->
+          <button id="cmd-k-trigger" class="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#27272a] hover:bg-[#141417] text-xs text-[#a1a1aa] hover:text-white transition-colors">
+            <span>Search</span>
+            <kbd class="text-[10px] font-mono bg-[#18181b] border border-[#27272a] px-1.5 py-0.5 rounded text-[#71717a]">⌘K</kbd>
+          </button>
+
+          <!-- Clear Chat -->
+          <button id="clear-chat-btn" title="Clear Canvas" class="p-1.5 rounded-lg border border-[#27272a] hover:bg-[#18181b] text-[#a1a1aa] hover:text-white transition-colors text-xs">
+            ↺
+          </button>
+        </div>
+      </header>
+
+      <!-- MESSAGES FEED -->
+      <div id="messages-container" class="flex-1 overflow-y-auto px-4 py-8 space-y-6 max-w-3xl w-full mx-auto">
+        
+        <!-- EMPTY STATE HERO (Cal.com inspired minimal welcome) -->
+        <div id="hero-empty-state" class="py-12 space-y-8 animate-fadeIn">
+          <div class="space-y-3">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full border border-[#27272a] bg-[#121214] text-xs font-mono text-[#a1a1aa]">
+              <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              chaosbot.com • Antigravity AI Engine
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
+              Unfiltered intelligence.<br />Calibrated precision.
+            </h1>
+            <p class="text-sm text-[#a1a1aa] max-w-lg leading-relaxed">
+              No corporate fluff. Switch to <strong class="text-white">Chaos Mode</strong> for raw creative breakthroughs, or <strong class="text-white">Order Mode</strong> for concise, surgical execution.
+            </p>
+          </div>
+
+          <!-- Cal.com Component-First Quick Action Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <button class="quick-prompt-card p-4 rounded-xl border border-[#27272a] bg-[#121214] hover:bg-[#18181b] hover:border-[#3f3f46] text-left transition-all group" data-prompt="Roast my AI startup architecture and tell me what will fail first:">
+              <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                <span>⚡ Roast My Architecture</span>
+                <span class="text-[#71717a] group-hover:text-white transition-colors">↗</span>
+              </div>
+              <p class="text-xs text-[#71717a] group-hover:text-[#a1a1aa] transition-colors leading-relaxed">
+                Brutally honest, unfiltered teardown of system design flaws.
+              </p>
+            </button>
+
+            <button class="quick-prompt-card p-4 rounded-xl border border-[#27272a] bg-[#121214] hover:bg-[#18181b] hover:border-[#3f3f46] text-left transition-all group" data-prompt="Format my messy notes into a concise 3-bullet executive brief with next actions:">
+              <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                <span>🛡️ Executive 3-Bullet Brief</span>
+                <span class="text-[#71717a] group-hover:text-white transition-colors">↗</span>
+              </div>
+              <p class="text-xs text-[#71717a] group-hover:text-[#a1a1aa] transition-colors leading-relaxed">
+                Strict Order mode: zero fluff, pure actionable facts.
+              </p>
+            </button>
+
+            <button class="quick-prompt-card p-4 rounded-xl border border-[#27272a] bg-[#121214] hover:bg-[#18181b] hover:border-[#3f3f46] text-left transition-all group" data-prompt="Explain how Gemma 2 (2B) achieves low latency on consumer Mac hardware:">
+              <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                <span>🧠 First-Principles Analysis</span>
+                <span class="text-[#71717a] group-hover:text-white transition-colors">↗</span>
+              </div>
+              <p class="text-xs text-[#71717a] group-hover:text-[#a1a1aa] transition-colors leading-relaxed">
+                Step-by-step reasoning showing attention caching & quantization.
+              </p>
+            </button>
+
+            <button class="quick-prompt-card p-4 rounded-xl border border-[#27272a] bg-[#121214] hover:bg-[#18181b] hover:border-[#3f3f46] text-left transition-all group" data-prompt="/terminal">
+              <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                <span>💻 Open Antigravity CLI</span>
+                <span class="text-[#71717a] group-hover:text-white transition-colors">↗</span>
+              </div>
+              <p class="text-xs text-[#71717a] group-hover:text-[#a1a1aa] transition-colors leading-relaxed">
+                Interactive terminal simulator matching your local app.py.
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- DYNAMIC MESSAGE LIST (Injected by JS) -->
+        <div id="message-list" class="space-y-6"></div>
+      </div>
+
+      <!-- FLOATING CAL.COM INPUT DOCK -->
+      <div class="p-4 border-t border-[#27272a] bg-[#09090b]/90 backdrop-blur-md flex-shrink-0">
+        <div class="max-w-3xl mx-auto">
+          <div class="relative rounded-xl border border-[#27272a] bg-[#121214] focus-within:border-[#52525b] focus-within:ring-1 focus-within:ring-[#52525b] transition-all">
+            <textarea
+              id="chat-textarea"
+              rows="1"
+              placeholder="Ask anything in Chaos or Order mode... (/exit, /think, /roast)"
+              class="w-full bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#71717a] resize-none outline-none max-h-40 font-normal"
+            ></textarea>
+            
+            <div class="flex items-center justify-between px-3 py-2 border-t border-[#1f1f23]">
+              <!-- Quick tool pills -->
+              <div class="flex items-center gap-1.5 text-xs text-[#71717a]">
+                <button id="active-mode-indicator" class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#1c1c20] text-[#d4d4d8] border border-[#2e2e33]">
+                  ⚡ Chaos Mode
+                </button>
+                <span class="text-[11px] font-mono hidden sm:inline text-[#52525b]">•</span>
+                <span class="text-[11px] font-mono hidden sm:inline text-[#71717a]">↵ send • ⇧↵ new line</span>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                id="send-button"
+                class="px-3.5 py-1.5 rounded-lg bg-white text-black font-semibold text-xs hover:bg-[#e4e4e7] active:scale-95 transition-all flex items-center gap-1.5 shadow-sm"
+              >
+                <span>Send</span>
+                <span class="text-[10px]">↵</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-[#52525b] px-1 pt-2 font-mono">
+            <span>Chaos Bot can operate in 100% offline mode via Ollama</span>
+            <span>Type <code class="text-[#a1a1aa]">/exit</code> to quit session</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- INTERACTIVE TERMINAL SIMULATOR MODAL (Antigravity CLI replica) -->
+    <div id="terminal-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-2xl bg-[#0d0d10] border border-[#27272a] rounded-xl overflow-hidden shadow-2xl animate-scaleUp">
+        <!-- Terminal Header -->
+        <div class="h-9 bg-[#17171a] border-b border-[#27272a] px-3 flex items-center justify-between text-xs text-[#71717a] font-mono">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
+              <button id="close-terminal-btn" class="w-3 h-3 rounded-full bg-[#ef4444] hover:opacity-80 transition-opacity"></button>
+              <div class="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#10b981]"></div>
+            </div>
+            <span class="text-[#a1a1aa] font-medium ml-2">apple@MacBook-Pro: ~/Desktop/Gemma-bot (zsh)</span>
+          </div>
+          <span class="text-[11px]">python3 app.py</span>
+        </div>
+
+        <!-- Terminal Output Body -->
+        <div id="terminal-body" class="p-4 font-mono-code text-xs text-[#d4d4d8] h-80 overflow-y-auto space-y-2 leading-relaxed">
+          <div class="text-[#71717a]">// Antigravity Local Engine Console</div>
+          <div>apple@MacBook-Pro Gemma-bot % <span class="text-white">python3 app.py</span></div>
+          <div class="text-emerald-400 font-bold">🤖 Gemma Assistant initialized! Type 'exit' or '/exit' to quit.</div>
+          <div class="text-[#71717a]">---------------------------------------------------------</div>
+          <div id="terminal-history"></div>
+        </div>
+
+        <!-- Terminal Input Bar -->
+        <div class="border-t border-[#27272a] bg-[#111114] px-4 py-2 flex items-center gap-2 font-mono-code text-xs">
+          <span class="text-emerald-400 font-bold">You:</span>
+          <input
+            id="terminal-input"
+            type="text"
+            placeholder="Type a message or /exit..."
+            class="flex-1 bg-transparent text-white outline-none font-mono-code"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMAND PALETTE MODAL (⌘K) -->
+    <div id="cmd-k-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start justify-center pt-24 p-4 hidden">
+      <div class="w-full max-w-lg bg-[#111114] border border-[#27272a] rounded-xl overflow-hidden shadow-2xl">
+        <div class="p-3 border-b border-[#27272a] flex items-center gap-2">
+          <span class="text-[#71717a]">🔍</span>
+          <input
+            id="cmd-k-input"
+            type="text"
+            placeholder="Type a command or search actions..."
+            class="w-full bg-transparent text-sm text-white outline-none placeholder-[#71717a]"
+          />
+          <kbd class="text-[10px] font-mono bg-[#1c1c20] px-1.5 py-0.5 rounded text-[#71717a] border border-[#27272a]">ESC</kbd>
+        </div>
+        <div class="p-2 space-y-1 text-xs">
+          <button class="cmd-item w-full text-left px-3 py-2 rounded-lg hover:bg-[#18181b] flex items-center justify-between text-[#d4d4d8]" data-cmd="toggle-mode">
+            <span>⚡ Toggle Chaos / Order Mode</span>
+            <kbd class="font-mono text-[10px] text-[#71717a]">⌘J</kbd>
+          </button>
+          <button class="cmd-item w-full text-left px-3 py-2 rounded-lg hover:bg-[#18181b] flex items-center justify-between text-[#d4d4d8]" data-cmd="open-terminal">
+            <span>💻 Launch Antigravity CLI Simulator</span>
+            <kbd class="font-mono text-[10px] text-[#71717a]">⌘T</kbd>
+          </button>
+          <button class="cmd-item w-full text-left px-3 py-2 rounded-lg hover:bg-[#18181b] flex items-center justify-between text-[#d4d4d8]" data-cmd="toggle-engine">
+            <span>🟢 Toggle Local (Offline) / Cloud Engine</span>
+            <kbd class="font-mono text-[10px] text-[#71717a]">⌘E</kbd>
+          </button>
+          <button class="cmd-item w-full text-left px-3 py-2 rounded-lg hover:bg-[#18181b] flex items-center justify-between text-[#d4d4d8]" data-cmd="clear">
+            <span>↺ Clear Current Conversation</span>
+            <kbd class="font-mono text-[10px] text-[#71717a]">⌘K ⌘C</kbd>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</Layout>
+
+<script is:inline>
+  // State management
+  let currentMode = 'chaos'; // 'chaos' | 'order'
+  let thinkEnabled = true;
+  let isLocalEngine = true;
+  const messages = [];
+
+  // DOM Elements
+  const modeChaosBtn = document.getElementById('mode-chaos-btn');
+  const modeOrderBtn = document.getElementById('mode-order-btn');
+  const activeModeIndicator = document.getElementById('active-mode-indicator');
+  const toggleThinkBtn = document.getElementById('toggle-think-btn');
+  const engineToggleBtn = document.getElementById('engine-toggle-btn');
+  const engineDot = document.getElementById('engine-dot');
+  const engineLabel = document.getElementById('engine-label');
+  const engineStatusBadge = document.getElementById('engine-status-badge');
+  const chatTextarea = document.getElementById('chat-textarea');
+  const sendButton = document.getElementById('send-button');
+  const heroEmptyState = document.getElementById('hero-empty-state');
+  const messageList = document.getElementById('message-list');
+  const messagesContainer = document.getElementById('messages-container');
+  const clearChatBtn = document.getElementById('clear-chat-btn');
+  const newChatBtn = document.getElementById('new-chat-btn');
+
+  // Terminal Simulator Elements
+  const toggleTerminalView = document.getElementById('toggle-terminal-view');
+  const terminalModal = document.getElementById('terminal-modal');
+  const closeTerminalBtn = document.getElementById('close-terminal-btn');
+  const terminalInput = document.getElementById('terminal-input');
+  const terminalHistory = document.getElementById('terminal-history');
+
+  // Command Palette Elements
+  const cmdKTrigger = document.getElementById('cmd-k-trigger');
+  const cmdKModal = document.getElementById('cmd-k-modal');
+  const cmdKInput = document.getElementById('cmd-k-input');
+
+  // Mode Toggling
+  function setMode(mode) {
+    currentMode = mode;
+    if (mode === 'chaos') {
+      modeChaosBtn.className = 'px-2.5 py-1 rounded-md bg-white text-black font-semibold transition-all shadow-sm flex items-center gap-1.5';
+      modeOrderBtn.className = 'px-2.5 py-1 rounded-md text-[#a1a1aa] hover:text-white transition-all flex items-center gap-1.5';
+      activeModeIndicator.innerHTML = '⚡ Chaos Mode';
+    } else {
+      modeOrderBtn.className = 'px-2.5 py-1 rounded-md bg-white text-black font-semibold transition-all shadow-sm flex items-center gap-1.5';
+      modeChaosBtn.className = 'px-2.5 py-1 rounded-md text-[#a1a1aa] hover:text-white transition-all flex items-center gap-1.5';
+      activeModeIndicator.innerHTML = '🛡️ Order Mode';
+    }
+  }
+
+  modeChaosBtn?.addEventListener('click', () => setMode('chaos'));
+  modeOrderBtn?.addEventListener('click', () => setMode('order'));
+
+  // Think Toggle
+  toggleThinkBtn?.addEventListener('click', () => {
+    thinkEnabled = !thinkEnabled;
+    const badge = toggleThinkBtn.querySelector('span:last-child');
+    if (badge) {
+      badge.textContent = thinkEnabled ? 'ON' : 'OFF';
+      badge.className = thinkEnabled 
+        ? 'text-[10px] font-mono px-1 rounded bg-[#27272a] text-[#a1a1aa]' 
+        : 'text-[10px] font-mono px-1 rounded bg-red-950/60 text-red-400 border border-red-800/40';
+    }
+  });
+
+  // Engine Switcher
+  function toggleEngine() {
+    isLocalEngine = !isLocalEngine;
+    if (isLocalEngine) {
+      engineDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+      engineLabel.textContent = 'Local Ollama';
+      if (engineStatusBadge) {
+        engineStatusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Local (Offline)';
+        engineStatusBadge.className = 'flex items-center gap-1.5 text-[11px] text-emerald-400 font-mono';
+      }
+    } else {
+      engineDot.className = 'w-2 h-2 rounded-full bg-blue-400';
+      engineLabel.textContent = 'Cloud Gemma';
+      if (engineStatusBadge) {
+        engineStatusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Cloud (Zero-Install)';
+        engineStatusBadge.className = 'flex items-center gap-1.5 text-[11px] text-blue-400 font-mono';
+      }
+    }
+  }
+  engineToggleBtn?.addEventListener('click', toggleEngine);
+
+  // Quick prompt cards
+  document.querySelectorAll('.quick-prompt-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const prompt = card.getAttribute('data-prompt');
+      if (prompt === '/terminal') {
+        terminalModal?.classList.remove('hidden');
+        terminalInput?.focus();
+        return;
+      }
+      chatTextarea.value = prompt;
+      handleSendMessage();
+    });
+  });
+
+  // Chat Submission
+  function handleSendMessage() {
+    const text = chatTextarea.value.trim();
+    if (!text) return;
+
+    if (text === '/exit' || text === 'exit') {
+      appendSystemMessage("Session terminated via exit command. Type any message to restart.");
+      chatTextarea.value = '';
+      return;
+    }
+
+    if (text === '/terminal') {
+      terminalModal?.classList.remove('hidden');
+      chatTextarea.value = '';
+      return;
+    }
+
+    // Hide hero if visible
+    if (heroEmptyState) heroEmptyState.style.display = 'none';
+
+    // Add user message
+    appendUserMessage(text);
+    chatTextarea.value = '';
+    chatTextarea.style.height = 'auto';
+
+    // Generate response
+    generateBotResponse(text);
+  }
+
+  function appendUserMessage(text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'flex justify-end';
+    msgDiv.innerHTML = `
+      <div class="max-w-[85%] rounded-xl px-4 py-2.5 bg-[#18181b] border border-[#27272a] text-sm text-white">
+        ${escapeHTML(text)}
+      </div>
+    `;
+    messageList.appendChild(msgDiv);
+    scrollToBottom();
+  }
+
+  function appendSystemMessage(text) {
+    const sysDiv = document.createElement('div');
+    sysDiv.className = 'flex justify-center my-2';
+    sysDiv.innerHTML = `
+      <div class="px-3 py-1 rounded-full bg-[#18181b] border border-[#27272a] text-xs font-mono text-[#a1a1aa]">
+        ${escapeHTML(text)}
+      </div>
+    `;
+    messageList.appendChild(sysDiv);
+    scrollToBottom();
+  }
+
+  function generateBotResponse(prompt) {
+    const responseContainer = document.createElement('div');
+    responseContainer.className = 'space-y-2';
+
+    // Cal.com styled assistant container
+    const isChaos = currentMode === 'chaos';
+    const modeBadge = isChaos 
+      ? '<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white text-black font-semibold">⚡ Chaos</span>'
+      : '<span class="text-[11px] font-mono px-2 py-0.5 rounded bg-[#27272a] text-white border border-[#3f3f46]">🛡️ Order</span>';
+
+    // Thought accordion (if enabled)
+    let thoughtHtml = '';
+    if (thinkEnabled) {
+      thoughtHtml = `
+        <details class="group mb-2 border border-[#27272a] rounded-lg bg-[#0e0e11] overflow-hidden">
+          <summary class="px-3 py-2 text-xs font-mono text-[#71717a] hover:text-[#d4d4d8] cursor-pointer flex items-center justify-between select-none">
+            <span class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+              <span>Thinking Process (140 tokens • 0.3s)</span>
+            </span>
+            <span class="text-[10px] group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="px-3 py-2 text-xs text-[#a1a1aa] font-mono bg-[#09090b] border-t border-[#1e1e24] leading-relaxed">
+            1. User prompt identified: "${escapeHTML(prompt)}"<br/>
+            2. Selected Persona: <strong>${isChaos ? 'Unfiltered Chaos' : 'Surgical Order'}</strong><br/>
+            3. Evaluating direct trade-offs and stripping filler content.<br/>
+            4. Local latency benchmark: Gemma 2B execution stream active.
+          </div>
+        </details>
+      `;
+    }
+
+    responseContainer.innerHTML = `
+      <div class="flex items-center gap-2 mb-1">
+        <div class="w-5 h-5 rounded-md bg-white text-black font-bold flex items-center justify-center text-[10px]">
+          ⚡
+        </div>
+        <span class="text-xs font-semibold text-white">Chaos Bot</span>
+        ${modeBadge}
+        <span class="text-[10px] font-mono text-[#52525b]">• ${isLocalEngine ? 'Local' : 'Cloud'}</span>
+      </div>
+      
+      ${thoughtHtml}
+
+      <div class="bot-text-content rounded-xl p-4 bg-[#121214] border border-[#27272a] text-sm text-[#f4f4f5] leading-relaxed space-y-3">
+        <div class="typing-indicator flex items-center gap-1.5 py-1 text-xs text-[#71717a] font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.2s]"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.4s]"></span>
+          <span>Synthesizing...</span>
+        </div>
+      </div>
+    `;
+
+    messageList.appendChild(responseContainer);
+    scrollToBottom();
+
+    // Simulate streaming content
+    setTimeout(() => {
+      const contentBox = responseContainer.querySelector('.bot-text-content');
+      let responseText = '';
+
+      if (isChaos) {
+        responseText = `
+          <p>Here's the raw truth without corporate polish: <strong>most AI implementations fail because of latency and bloated wrappers</strong>.</p>
+          <p>By pairing local Gemma 2 (2B) weights directly with on-device execution, we eliminate cloud lock-in and vendor pricing traps. You run offline, retain 100% data sovereignty, and cut response times down to native hardware speeds.</p>
+          <div class="p-3 rounded-lg bg-[#0a0a0c] border border-[#27272a] font-mono-code text-xs text-emerald-400">
+            // Antigravity verification<br/>
+            $ python3 app.py --mode=chaos --stream=true<br/>
+            [OK] Ollama stream active: 0ms network round-trip.
+          </div>
+        `;
+      } else {
+        responseText = `
+          <p class="font-semibold text-white">Executive Synthesis:</p>
+          <ul class="list-disc pl-5 space-y-1 text-xs text-[#d4d4d8]">
+            <li><strong>Data Sovereignty:</strong> 100% on-device execution via local Ollama engine; zero external egress.</li>
+            <li><strong>Zero Latency Overhead:</strong> Removes network round-trip delays entirely when offline.</li>
+            <li><strong>Fallback Redundancy:</strong> Seamless automatic handoff to Cloud Gemma when deployed to public visitors.</li>
+          </ul>
+        `;
+      }
+
+      contentBox.innerHTML = responseText;
+      scrollToBottom();
+    }, 450);
+  }
+
+  function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+  }
+
+  // Keybindings & Listeners
+  chatTextarea?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  });
+
+  sendButton?.addEventListener('click', handleSendMessage);
+
+  clearChatBtn?.addEventListener('click', () => {
+    messageList.innerHTML = '';
+    if (heroEmptyState) heroEmptyState.style.display = 'block';
+  });
+
+  newChatBtn?.addEventListener('click', () => {
+    messageList.innerHTML = '';
+    if (heroEmptyState) heroEmptyState.style.display = 'block';
+  });
+
+  // Terminal Simulator Logic
+  toggleTerminalView?.addEventListener('click', () => {
+    terminalModal?.classList.remove('hidden');
+    terminalInput?.focus();
+  });
+
+  closeTerminalBtn?.addEventListener('click', () => {
+    terminalModal?.classList.add('hidden');
+  });
+
+  terminalInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const val = terminalInput.value.trim();
+      if (!val) return;
+
+      const userLine = document.createElement('div');
+      userLine.innerHTML = `<span class="text-white">You:</span> ${escapeHTML(val)}`;
+      terminalHistory.appendChild(userLine);
+      terminalInput.value = '';
+
+      if (val === 'exit' || val === '/exit') {
+        const exitLine = document.createElement('div');
+        exitLine.className = 'text-yellow-400 font-bold';
+        exitLine.textContent = 'Goodbye!';
+        terminalHistory.appendChild(exitLine);
+        setTimeout(() => {
+          terminalModal?.classList.add('hidden');
+        }, 800);
+      } else {
+        const botLine = document.createElement('div');
+        botLine.className = 'text-emerald-400';
+        botLine.innerHTML = `Gemma: <span class="text-[#f4f4f5]">Chaos Bot CLI responding directly from local Gemma 2 engine. All exit commands (/exit, quit) active.</span>`;
+        terminalHistory.appendChild(botLine);
+      }
+      const tBody = document.getElementById('terminal-body');
+      tBody.scrollTop = tBody.scrollHeight;
+    }
+  });
+
+  // Command Palette Keyboard Shortcuts
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      cmdKModal?.classList.toggle('hidden');
+      if (!cmdKModal?.classList.contains('hidden')) {
+        cmdKInput?.focus();
+      }
+    } else if (e.key === 'Escape') {
+      cmdKModal?.classList.add('hidden');
+      terminalModal?.classList.add('hidden');
+    } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
+      e.preventDefault();
+      setMode(currentMode === 'chaos' ? 'order' : 'chaos');
+    }
+  });
+
+  cmdKTrigger?.addEventListener('click', () => {
+    cmdKModal?.classList.remove('hidden');
+    cmdKInput?.focus();
+  });
+
+  document.querySelectorAll('.cmd-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const cmd = item.getAttribute('data-cmd');
+      cmdKModal?.classList.add('hidden');
+      if (cmd === 'toggle-mode') {
+        setMode(currentMode === 'chaos' ? 'order' : 'chaos');
+      } else if (cmd === 'open-terminal') {
+        terminalModal?.classList.remove('hidden');
+        terminalInput?.focus();
+      } else if (cmd === 'toggle-engine') {
+        toggleEngine();
+      } else if (cmd === 'clear') {
+        messageList.innerHTML = '';
+        if (heroEmptyState) heroEmptyState.style.display = 'block';
+      }
+    });
+  });
+</script>
